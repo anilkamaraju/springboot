@@ -1,0 +1,16 @@
+name: Pull Request Stats
+
+on: pull_request
+
+jobs:
+  stats:
+    runs-on: self-hosted
+    steps:
+      - name: Run pull request stats
+        uses: flowwer-dev/pull-request-stats@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repositories: 'anilkamaraju/springboot'
+          period: 7
+          charts: true
+          sort-by: 'COMMENTS'
