@@ -6,7 +6,7 @@ on:
 
 jobs:
   code_review:
-    runs-on: ubuntu-latest  # Or a Java/Node.js runner for specific language needs
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
 
