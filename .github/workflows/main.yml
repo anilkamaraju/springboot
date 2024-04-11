@@ -1,16 +1,47 @@
-name: Pull Request Stats
+name: Code Review
 
-on: pull_request
+on:
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  stats:
-    runs-on: self-hosted
+  code_review:
+    runs-on: ubuntu-latest  # Or a Java/Node.js runner for specific language needs
     steps:
-      - name: Run pull request stats
-        uses: flowwer-dev/pull-request-stats@master
+      - uses: actions/checkout@v3
+
+      # Java checks
+      - name: Install Java tools (if needed)
+        uses: actions/setup-java@v3
         with:
-          token: ${{ secrets.ADD_A_PERSONAL_ACCESS_TOKEN }}
-          repositories: 'anilkamaraju/springboot'
-          period: 7
-          charts: true
-          sort-by: 'COMMENTS'
+          java-version: '1.8' # Customize based on your project
+      - name: Cache Maven packages (if needed)
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Run SpotBugs (Java)
+        run: mvn spotbugs:spotbugs  # Or other Java tools
+      - name: Run google-java-format (Java)
+        run: |
+          ./gradlew format  # Or adapt for your build system
+
+      # Unused imports (adapt tools for each language)
+      - name: Run FindBugs (Java)  # Or UnusedClazz
+        run: mvn findbugs:findbugs  # Or other tools
+      - name: Run ESLint unused import plugin (React)  # Configure in .eslintrc.js
+
+      # Exception handling (limited automation)
+      # ... (refer to previous response for guidance)
+
+      # AI tools (optional)
+      # ... (refer to previous response for guidance)
+
+      # Fail PR on check failures
+      - name: Fail PR if Checks Failed
+        run: |
+          exit 1
+        if: always() && (steps.spotbugs.outputs.failed != 'false' || steps.eslint.exit_code != 0)
+          # Add similar conditions for other tools
